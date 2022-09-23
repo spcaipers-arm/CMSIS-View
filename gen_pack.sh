@@ -7,6 +7,9 @@
 set -o pipefail
 
 # Set version of gen pack library
+
+
+
 REQUIRED_GEN_PACK_LIB="0.2.0"
 
 # Set default command line arguments
