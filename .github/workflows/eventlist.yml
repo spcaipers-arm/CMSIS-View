@@ -60,35 +60,50 @@ jobs:
           ./make.sh build -os windows -arch arm64 -outdir build/windows-arm64
         working-directory: ./tools/eventlist
 
-      - name: Archive eventlist
+      - name: Ensure eventlist executable binary
+        run: |
+          chmod +x build/*/eventlist
+          ls -laR build/
+        working-directory: ./tools/eventlist
+
+
+      - name: Tar Linux and Darwin eventlist to avoid losing file permission
+        run: |
+          tar -cvf linux-amd64.tar linux-amd64
+          tar -cvf linux-arm64.tar linux-arm64
+          tar -cvf darwin-amd64.tar darwin-amd64
+          tar -cvf darwin-arm64.tar darwin-arm64
+        working-directory: ./tools/eventlist/build
+
+      - name: Archive eventlist tar file
         uses: actions/upload-artifact@v3
         with:
           name: eventlist-linux-amd64
-          path: ./tools/eventlist/build/linux-amd64
+          path: ./tools/eventlist/build/linux-amd64.tar
           retention-days: 1
           if-no-files-found: error
 
-      - name: Archive eventlist
+      - name: Archive eventlist tar file
         uses: actions/upload-artifact@v3
         with:
           name: eventlist-linux-arm64
-          path: ./tools/eventlist/build/linux-arm64
+          path: ./tools/eventlist/build/linux-arm64.tar
           retention-days: 1
           if-no-files-found: error
 
-      - name: Archive eventlist
+      - name: Archive eventlist tar file
         uses: actions/upload-artifact@v3
         with:
           name: eventlist-darwin-amd64
-          path: ./tools/eventlist/build/darwin-amd64
+          path: ./tools/eventlist/build/darwin-amd64.tar
           retention-days: 1
           if-no-files-found: error
 
-      - name: Archive eventlist
+      - name: Archive eventlist tar file
         uses: actions/upload-artifact@v3
         with:
           name: eventlist-darwin-arm64
-          path: ./tools/eventlist/build/darwin-arm64
+          path: ./tools/eventlist/build/darwin-arm64.tar
           retention-days: 1
           if-no-files-found: error
 
@@ -347,6 +362,12 @@ jobs:
 
       - name: Zip folders
         run: |
+          # untar first
+          tar -xvf eventlist-linux-amd64.tar
+          tar -xvf eventlist-linux-arm64.tar
+          tar -xvf eventlist-darwin-amd64.tar
+          tar -xvf eventlist-darwin-arm64.tar
+
           zip -r eventlist-windows-amd64.zip eventlist-windows-amd64/eventlist.exe eventlist-windows-amd64/docs eventlist-windows-amd64/LICENSE
           zip -r eventlist-windows-arm64.zip eventlist-windows-arm64/eventlist.exe eventlist-windows-arm64/docs eventlist-windows-arm64/LICENSE
           tar -czvf eventlist-linux-amd64.tar.gz  eventlist-linux-amd64/eventlist eventlist-linux-amd64/docs eventlist-linux-amd64/LICENSE
